@@ -126,7 +126,7 @@ def main():
     
     # Get local machine name
     host = '127.0.0.1'
-    port = 12346  # Changed port number
+    port = 12349  # Changed port number
     
     # Bind to the port
     server_socket.bind((host, port))
