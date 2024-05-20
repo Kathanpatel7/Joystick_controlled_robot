@@ -56,24 +56,21 @@ def action_dpad_right():
 
 # Map each button index to its corresponding action
 button_actions = {
-    0: action_cross,      # Square button
-    1: action_circle,       # Cross button
-    2: action_square,      # Circle button
-    3: action_triangle,    # Triangle button
-    4: action_share,          # L1 button
-    5: action_ps,          # R1 button
-    6: action_options,          # L2 button
-    7: action_l3,          # R2 button
-    8: action_r3,       # Share button
-    9: action_l1,     # Options button
-    10: action_r1,         # PS button
-    11: action_dpad_up, # Left stick button
-    12: action_dpad_down,# Right stick button
-    13: action_dpad_left,    # DPAD Up
-    14: action_dpad_right,  # DPAD Down
-    #15: action_dpad_left,  # DPAD Left
-    16: action_dpad_down, # DPAD Right
-    # Add more mappings for other buttons as needed
+    0: action_cross,      # Cross button
+    1: action_circle,     # Circle button
+    2: action_square,     # Square button
+    3: action_triangle,   # Triangle button
+    4: action_share,      # Share button
+    5: action_ps,         # PS button
+    6: action_options,    # Options button
+    7: action_l3,         # Left stick button
+    8: action_r3,         # Right stick button
+    9: action_l1,         # L1 button
+    10: action_r1,        # R1 button
+    11: action_dpad_up,   # DPAD Up
+    12: action_dpad_down, # DPAD Down
+    13: action_dpad_left, # DPAD Left
+    14: action_dpad_right,# DPAD Right
 }
 
 # Function to publish integer values over a socket
@@ -126,7 +123,7 @@ def main():
     
     # Get local machine name
     host = '127.0.0.1'
-    port = 12349  # Changed port number
+    port = 12330  # Port number
     
     # Bind to the port
     server_socket.bind((host, port))
@@ -148,31 +145,34 @@ def main():
             left_y = joystick.get_axis(1)
             right_x = joystick.get_axis(2)
             right_y = joystick.get_axis(3)
+            axis_5 = joystick.get_axis(5)  # Read axis 5 value
 
-            # Determine direction for left joystick
-            if left_x < -0.5:
-                action_joystick("Left", "L_left")
-            elif left_x > 0.5:
-                action_joystick("Left", "L_right")
-            if left_y < -0.5:
-                action_joystick("Left", "L_up")
-            elif left_y > 0.5:
-                action_joystick("Left", "L_down")
+            if axis_5 > 0.5:  # Check if axis 5 is pressed
+                # Determine direction for left joystick
+                if left_x < -0.5:
+                    action_joystick("Left", "L_left")
+                elif left_x > 0.5:
+                    action_joystick("Left", "L_right")
+                if left_y < -0.5:
+                    action_joystick("Left", "L_up")
+                elif left_y > 0.5:
+                    action_joystick("Left", "L_down")
 
-            # Determine direction for right joystick
-            if right_x < -0.5:
-                action_joystick("Right", "R_left")
-            elif right_x > 0.5:
-                action_joystick("Right", "R_right")
-            if right_y < -0.5:
-                action_joystick("Right", "R_up")
-            elif right_y > 0.5:
-                action_joystick("Right", "R_down")
+                # Determine direction for right joystick
+                if right_x < -0.5:
+                    action_joystick("Right", "R_left")
+                elif right_x > 0.5:
+                    action_joystick("Right", "R_right")
+                if right_y < -0.5:
+                    action_joystick("Right", "R_up")
+                elif right_y > 0.5:
+                    action_joystick("Right", "R_down")
 
             # Read button events
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:
-                    if event.button in button_actions:
+                    if event.button in button_actions and axis_5 > 0.5:
+                        print("Value published = ")
                         button_actions[event.button]()
 
             # Control the event loop frequency
