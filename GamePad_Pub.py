@@ -123,7 +123,7 @@ def main():
     
     # Get local machine name
     host = '127.0.0.1'
-    port = 12330  # Port number
+    port = 12331  # Port number
     
     # Bind to the port
     server_socket.bind((host, port))
@@ -136,6 +136,7 @@ def main():
     # Establish a connection
     client_socket, addr = server_socket.accept()
     print("Got a connection from %s" % str(addr))
+    print("Press R2 button as servo button to Jogg robot.")
 
     try:
         # Main loop to continuously read input from the controller
