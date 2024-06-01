@@ -123,7 +123,7 @@ def main():
     
     # Get local machine name
     host = '127.0.0.1'
-    port = 12331  # Port number
+    port = 12334  # Port number
     
     # Bind to the port
     server_socket.bind((host, port))
@@ -168,6 +168,8 @@ def main():
                     action_joystick("Right", "R_up")
                 elif right_y > 0.5:
                     action_joystick("Right", "R_down")
+            else:
+                publish(0)
 
             # Read button events
             for event in pygame.event.get():
@@ -175,9 +177,10 @@ def main():
                     if event.button in button_actions and axis_5 > 0.5:
                         print("Value published = ")
                         button_actions[event.button]()
+                        
 
             # Control the event loop frequency
-            clock.tick(60)  # Adjust the argument as needed (e.g., 60 FPS)
+            clock.tick(30)  # Adjust the argument as needed (e.g., 60 FPS)
 
     except KeyboardInterrupt:
         print("Server stopped.")
