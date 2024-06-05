@@ -27,8 +27,11 @@ def dealdata(data_new, data_rec):
     if data_new[0] == 1:
         # translation packet
         data_rec[0] = data_new[1] + (data_new[2]*256)
+        
         data_rec[1] = data_new[3] + (data_new[4]*256)
+        
         data_rec[2] = data_new[5] + (data_new[6]*256)
+        
 
         if data_new[2] > 127:
             data_rec[0] -= 65536
@@ -36,6 +39,13 @@ def dealdata(data_new, data_rec):
             data_rec[1] -= 65536
         if data_new[6] > 127:
             data_rec[2] -= 65536
+        
+        lx = data_rec[0]
+        ly = data_rec[1]
+        lz = data_rec[2]
+        rx = data_rec[3]
+        ry = data_rec[4]
+        rz = data_rec[5]
 
     if data_new[0] == 2:
         # rotation packet
@@ -49,10 +59,25 @@ def dealdata(data_new, data_rec):
             data_rec[4] -= 65536
         if data_new[6] > 127:
             data_rec[5] -= 65536
+        
+        lx = data_rec[0]
+        ly = data_rec[1]
+        lz = data_rec[2]
+        rx = data_rec[3]
+        ry = data_rec[4]
+        rz = data_rec[5]
 
     if data_new[0] == 3:
         data_rec[6] = data_new[1] & 0x01
         data_rec[7] = (data_new[1] & 0x02) >> 1
+        
+        lx = data_rec[0]
+        ly = data_rec[1]
+        lz = data_rec[2]
+        rx = data_rec[3]
+        ry = data_rec[4]
+        rz = data_rec[5]
+
 
     # Apply the logic for data_rec values
     for i in range(6):
@@ -62,9 +87,9 @@ def dealdata(data_new, data_rec):
             data_rec[i] = -1
         else:
             data_rec[i] = 0
-
+    kkp = [lx,ly,lz,rx,ry,rz,data_rec[6],data_rec[7]]
     # Return the processed data
-    return data_rec
+    return kkp
 
 def sigint_handler(signal, frame):
     global run
@@ -95,6 +120,13 @@ def read_task(dev, client_socket):
 
 if __name__ == '__main__':
     global run
+    global lx
+    global ly
+    global lz
+    global rx
+    global ry
+    global rz
+    
     run = True
 
     signal.signal(signal.SIGINT, sigint_handler)
