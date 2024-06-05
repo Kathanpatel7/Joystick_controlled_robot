@@ -48,6 +48,8 @@ def set_v(data, robot_speed, omega):
             current_pose[i] = robot_speed
         elif data[i] == -1:
             current_pose[i] = -robot_speed
+        else:
+            current_pose[i] = 0        
     
     return current_pose
 
@@ -59,9 +61,9 @@ def main():
     robot_speed = 10
     omega = 10
     current_pose = [0] * 8  # Initialize current_pose array
+    final_matrix = [0] * 6
 
     robot_ip = '192.168.1.200'
-    
     conSuc, robot_sock = connectETController(robot_ip)
     if not conSuc:
         print('Failed to connect to the robot.')
@@ -89,9 +91,17 @@ def main():
         while True:
             data = client_socket.recv(1024)
             if not data:
-                break
-            decoded_data = json.loads(data.decode('utf-8'))
-            print(f'Received: {decoded_data}')
+                decoded_data = [0] * 8
+            else:
+                decoded_data = json.loads(data.decode('utf-8'))
+
+            for i in range(6):
+                if decoded_data[i] > 50:
+                    decoded_data[i] = 1
+                elif decoded_data[i] < -50:
+                    decoded_data[i] = -1
+                else:
+                    decoded_data[i] = 0
             
             if decoded_data != [0] * 8:
                 if decoded_data[6] == 1 and robot_speed > 0 and omega > 0:
@@ -103,14 +113,20 @@ def main():
                     omega += 2
                     print('Speed increased to:', robot_speed)
                 else:
-                    final_matrix = set_v(decoded_data, robot_speed, omega)
+                    temp = set_v(decoded_data, robot_speed, omega)
+                    final_matrix = temp[:6]
+                    final_matrix[0] = - final_matrix[0]
+                    final_matrix[2] = - final_matrix[2]
+                    final_matrix[3] = - final_matrix[3]
+                    #final_matrix[4] = - final_matrix[4 ]
+                    final_matrix[5] = - final_matrix[5]
                     if len(decoded_data) == 8:
+                        print(f'Received: {final_matrix}')
                         suc, result, id = sendCMD(robot_sock, 'moveBySpeedl', {'v': final_matrix, 'acc': 50, 'arot': 10, 't': 0.1})
                         print(suc, result, id)
             else:
-                suc, result ,id=sendCMD(robot_sock,"stopl",{"acc":120})
+                #suc, result, id = sendCMD(robot_sock, "stopl", {"acc": 190})
                 decoded_data = [0] * 8
-                
                 
     except KeyboardInterrupt:
         print('Client stopped.')
